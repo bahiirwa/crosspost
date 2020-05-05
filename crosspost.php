@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Crosspost
- * Description: Automatically add latest posts from other WordPress sites with a shortcode like [crosspost url="example.com" postnumber="3"]
+ * Description: Automatically add posts from another WordPress website using a shortcode. like [crosspost url="example.com"]
  * Version: 0.1.0
  * Author: Laurence Bahiirwa 
  * Author URI: https://omukiguy.com
@@ -50,10 +50,10 @@ class Crosspost {
 	public static function process_shortcode( $atts ) {
 		// Default values for when not passed in shortcode.
 		$defaults = [
-			'url'  => '',
-			'characters'  => '150',
-			'readmoretext'  => 'Read more',
-			'postnumber'  => '3'
+			'url'          => '',
+			'characters'   => '150',
+			'readmoretext' => 'Read more',
+			'number'       => '3',
 		];
 
 		// Replace any missing shortcode arguments with defaults.
@@ -77,22 +77,26 @@ class Crosspost {
 				. ' -->'
 			);
 		}
-			
+
+		$count = 0;
 		foreach ( $release_data as $data ) {
+
+			// When your count is at $atts['number'] "continue" is to go to the end of the loop.
+			if ( $atts['number'] == $count++ ) break;
 			
 			$html .= (
-				'<div class="crosspost-plugin" id="' . $data['id'] . '">' .
-					'<img class="featured-image" src="' . $data['featured_image_src'] . '" />' .
-					'<h3>' . $data['title']['rendered'] . '</h3>' .
-					'<div class="content">' . self::reduce_content( $data['content']['rendered'], $atts['characters'] ) . '</div>' .
+				'<div class="crosspost-plugin" id="' . esc_attr( $data['id'] ) . '">' .
+					'<img class="featured-image" src="' . esc_url( $data['featured_image_src'] ) . '" />' .
+					'<h3>' . esc_attr( $data['title']['rendered'] ) . '</h3>' .
+					'<div class="content">' . esc_attr( self::reduce_content( $data['content']['rendered'], $atts['characters'] ) ) . '</div>' .
 					'<div class="post-meta">' .
-						'<span class="date">' . self::convert_date_to_human( $data['date'] ) . '</span>' .
-						'<span class="author">' . $data['author_info']['display_name'] . '</span>' .
+						'<span class="date">' . esc_attr( self::convert_date_to_human( $data['date'] ) ) . '</span>' .
+						'<span class="author">' . esc_attr( $data['author_info']['display_name'] ) . '</span>' .
 					'</div>' .
-					'<a href="' . $data['link'] . '">' . $atts['readmoretext'] . '</a>' .
+					'<a href="' . esc_url( $data['link'] ) . '">' . esc_attr( $atts['readmoretext'] ) . '</a>' .
 				'</div>' 
 			);
-				
+
 		}
 
 		/**
@@ -106,12 +110,25 @@ class Crosspost {
 		return apply_filters( 'crosspost_link', $html, $atts );
 	}
 
+	/**
+	 * Trim the content block to show on the post item.
+	 *
+	 * @param string $string  Post Content Block
+	 * @param int    $characters Number of characters to show on the post block.
+	 * @return void
+	 */	
 	public static function reduce_content( $string, $characters ) {
 		if ( strlen( $string ) > 10 ) {
 			return esc_textarea( sanitize_text_field( $string = substr( $string , 0, $characters ) ) ); 
 		}
 	}
 
+	/**
+	 * Convert date to human readble time.
+	 *
+	 * @param date   $date
+	 * @return void
+	 */
 	public static function convert_date_to_human( $date ) {
 		return $date = date( 'l jS M Y g:ia ', strtotime( $date ) );
 	}
@@ -119,9 +136,9 @@ class Crosspost {
 	/**
 	 * Fetch release data from External Website or return it from a cached value.
 	 *
-	 * @since 2.0.0
+	 * @since 0.1.0
 	 *
-	 * @param array $atts Array containing 'user' and 'repo' arguments.
+	 * @param array $atts Array containing 'url' arguments.
 	 * @return array|\WP_Error Release data from External Website, or an error object.
 	 */
 	public static function get_release_data_cached( $atts ) {
@@ -148,12 +165,11 @@ class Crosspost {
 
 	/**
 	 * Return the name of the transient that should be used to cache the
-	 * release information for a repository.
-	 *
-	 * @since 1.2.0
-	 * @since 2.0.0 The function is now static, and the transient names have
+	 * release information for a repository. The function is static, and the transient names have
 	 * changed because the full release data is stored instead of just the URL
 	 * to a zip file.
+	 *
+	 * @since 0.1.0 
 	 *
 	 * @param array $atts Array containing 'user' and 'repo' arguments.
 	 * @return string Transient name to use for caching this repository.
@@ -168,14 +184,15 @@ class Crosspost {
 	/**
 	 * Fetch release data from External Website.
 	 *
-	 * @since 2.0.0
+	 * @since 0.1.0
 	 *
 	 * @internal - use self::get_release_data_cached() instead.
 	 *
-	 * @param array $atts Array containing 'user' and 'repo' arguments.
+	 * @param array $atts Array containing 'url' arguments.
 	 * @return array|\WP_Error Release data from External Website, or an error object.
 	 */
 	private static function get_release_data( $atts ) {
+
 		// Build the External Website API URL for the latest release.
 		$api_url = ( $atts['url'] . '/wp-json/wp/v2/posts'
 		);
@@ -206,39 +223,6 @@ class Crosspost {
 		return $response_json;
 	}
 
-	/**
-	 * Given a set of release data from the External Website API, return a release zip URL.
-	 *
-	 * @since 2.0.0
-	 *
-	 * @param array $release_data Release data from the External Website API.
-	 * @return string URL of latest zip release file on External Website.
-	 */
-	// public static function get_zip_url_for_release( $release_data ) {
-	// 	// If any files were uploaded for this release, use the first one.
-	// 	// TODO: Allow specifying which file to use somehow (name regex?)
-	// 	if ( ! empty( $release_data['assets'] ) ) {
-	// 		return $release_data['assets'][0]['browser_download_url'];
-	// 	}
-
-	// 	// Otherwise, build a URL based on the tag name of the latest release.
-	// 	$version = $release_data['tag_name'];
-
-	// 	// Extract the user and repo name from the External Website API URL.
-	// 	preg_match(
-	// 		'#^https://api\.External Website\.com/repos/([^/]+)/([^/]+)/releases/#',
-	// 		$release_data['url'],
-	// 		$matches
-	// 	);
-	// 	$user = $matches[1];
-	// 	$repo = $matches[2];
-
-	// 	return (
-	// 		'https://External Website.com/'
-	// 		. $user . '/' . $repo
-	// 		. '/archive/' . $version . '.zip'
-	// 	);
-	// }
 }
 
 Crosspost::register();
