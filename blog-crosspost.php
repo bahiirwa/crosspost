@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name: Crosspost
- * Description: Automatically add posts from another WordPress website using a shortcode. like [crosspost url="example.com"]
+ * Plugin Name: Blog Crosspost
+ * Description: Automatically add posts from another WordPress website using a shortcode. like [blogcrosspost url="example.com"]
  * Version: 0.1.0
  * Author: Laurence Bahiirwa 
  * Author URI: https://omukiguy.com
- * Plugin URI: https://github.com/bahiirwa/crosspost
- * Text Domain: crosspost
+ * Plugin URI: https://github.com/bahiirwa/blogcrosspost
+ * Text Domain: blogcrosspost
  * Requires at least: 4.9
  * Tested up to: 5.4.1
  * 
@@ -17,14 +17,14 @@
  *
  */
 
-namespace bahiirwa\Crosspost;
+namespace bahiirwa\Blogcrosspost;
 
 // Prevent direct access.
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
 
-class Crosspost {
+class Blogcrosspost {
 	/**
 	 * Add action to process shortcodes.
 	 *
@@ -33,7 +33,7 @@ class Crosspost {
 	 *
 	 */
 	public static function register() {
-		add_shortcode( 'crosspost', [ __CLASS__, 'process_shortcode' ] );
+		add_shortcode( 'blogcrosspost', [ __CLASS__, 'process_shortcode' ] );
 	}
 
 	/**
@@ -60,19 +60,19 @@ class Crosspost {
 		$atts = shortcode_atts(
 			$defaults,
 			$atts,
-			'crosspost'
+			'blogcrosspost'
 		);
 
 		// Validate the user and the repo.
 		if ( empty( $atts['url'] ) ) {
-			return '<p>[crosspost] Missing URL</p>';
+			return '<p>[blogcrosspost] Missing URL</p>';
 		}
 
 		// Get the release data from External Website.
 		$release_data = self::get_release_data_cached( $atts );
 		if ( is_wp_error( $release_data ) ) {
 			return (
-				'<!-- [crosspost] '
+				'<!-- [blogcrosspost] '
 				. esc_html( $release_data->get_error_message() )
 				. ' -->'
 			);
@@ -85,7 +85,7 @@ class Crosspost {
 			if ( $atts['number'] == $count++ ) break;
 			
 			$html .= (
-				'<div class="crosspost-plugin" id="' . esc_attr( $data['id'] ) . '">' .
+				'<div class="blogcrosspost-plugin" id="' . esc_attr( $data['id'] ) . '">' .
 					'<img class="featured-image" src="' . esc_url( $data['featured_image_src'] ) . '" />' .
 					'<h3>' . esc_attr( $data['title']['rendered'] ) . '</h3>' .
 					'<div class="content">' . esc_attr( self::reduce_content( $data['content']['rendered'], $atts['characters'] ) ) . '</div>' .
@@ -107,7 +107,7 @@ class Crosspost {
 		 * @param string $html The link HTML.
 		 * @param array  $atts The full array of shortcode attributes.
 		 */
-		return apply_filters( 'crosspost_link', $html, $atts );
+		return apply_filters( 'blogcrosspost_link', $html, $atts );
 	}
 
 	/**
@@ -176,7 +176,7 @@ class Crosspost {
 	 */
 	public static function get_transient_name( $atts ) {
 		return (
-			'crosspost_link_'
+			'blogcrosspost_link_'
 			. substr( md5( $atts['url'] ), 0, 16 )
 		);
 	}
@@ -225,4 +225,4 @@ class Crosspost {
 
 }
 
-Crosspost::register();
+blogcrosspost::register();
