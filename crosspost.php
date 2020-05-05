@@ -5,7 +5,7 @@
  * Version: 0.1.0
  * Author: Laurence Bahiirwa 
  * Author URI: https://omukiguy.com
- * Plugin URI: https://External Website.com/bahiirwa/crosspost
+ * Plugin URI: https://github.com/bahiirwa/crosspost
  * Text Domain: crosspost
  * Requires at least: 4.9
  * Tested up to: 5.4.1
@@ -45,7 +45,7 @@ class Crosspost {
 	 * @since 2.0.0 The function is now static.
 	 *
 	 * @param array $atts Shortcode arguments.
-	 * @return string <a href="(zip url)" class="cp-release-link">$atts[name]</a>
+	 * @return string $html
 	 */
 	public static function process_shortcode( $atts ) {
 		// Default values for when not passed in shortcode.
@@ -79,9 +79,6 @@ class Crosspost {
 		}
 			
 		foreach ( $release_data as $data ) {
-			// echo '<pre>';
-			// var_dump( $data );
-			// echo '</pre>';
 			
 			$html .= (
 				'<div class="crosspost-plugin" id="' . $data['id'] . '">' .
