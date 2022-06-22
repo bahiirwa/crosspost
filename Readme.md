@@ -8,12 +8,12 @@ Add the shortcode ```[blogcrosspost url="example.com"]``` to desired post/page/w
 One can add some customization to the shortcode such as":
 
 * Link to external website = ```[blogcrosspost url="example.com"]```
-* Number of Posts to show  = ```[blogcrosspost postnumber="3"]```
+* Number of Posts to show  = ```[blogcrosspost number="3"]```
 * Name for the Readme link = ```[blogcrosspost readmoretext="Learn More"]```
 
 or use all of them in one go as:
 
-```[blogcrosspost url="example.com" postnumber="3" readmoretext="Learn More"]```
+```[blogcrosspost url="example.com" number="3" readmoretext="Learn More"]```
 
 You can also change the HTML structure using ```apply_filters( 'blogcrosspost_link', $html, $atts );```
 
