@@ -18,19 +18,23 @@ or use all of them in one go as:
 You can also change the HTML structure using ```apply_filters( 'blogcrosspost_link', $html, $atts );```
 
 ## Screenshots
-![Adding the shortcode into WordPress Page](screnshot-1.png)
-![Sample Posts on front-end](screnshot-2.png)
-![Sample Posts on front-end](screnshot-3.png)
+![Adding the shortcode into WordPress Page](./.wordpress-org/screnshot-1.png)
+![Sample Posts on front-end](./.wordpress-org/screnshot-2.png)
+![Sample Posts on front-end](./.wordpress-org/screnshot-3.png) 
 
 ## Upcoming features
-- [ ] Add an admin subpage under settings page to customize the usage of the options.
-- [ ] Add a customizable widget in widgets area.
 - [ ] Add a Gutenberg Block.
 
 ## Contribute/Issues/Feedback
 If you have any feedback, just write an issue. Or fork the code and submit a PR [on Github](https://github.com/bahiirwa/blogcrosspost).
 
 ## Changelog
+
+### 0.2.0
+- Bugfix for broken Image URL and Author Display Name.
+- Added filters for all responses.
+- Added class options.
+- Bugfix for counter in loop display.
 
 ### 0.1.0
 - Initial Release.

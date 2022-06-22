@@ -3,9 +3,9 @@ Contributors: laurencebahiirwa
 Donate link: https://omukiguy.com/
 Tags: blog, crosspost, Rest, 
 Requires at least: 4.9.0
-Tested up to: 5.4
+Tested up to: 6.0
 Requires PHP: 5.6
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,14 +36,17 @@ You can also change the HTML structure using ```apply_filters( 'blogcrosspost_li
 1. Sample Posts on front-end
 
 == Upcoming features ==
-- [ ] Add an admin subpage under settings page to customize the usage of the options.
-- [ ] Add a customizable widget in widgets area.
 - [ ] Add a Gutenberg Block.
 
 == Contribute/Issues/Feedback ==
 If you have any feedback, just write an issue. Or fork the code and submit a PR [on Github](https://github.com/bahiirwa/blogcrosspost).
 
 == Changelog ==
+
+** 0.2.0 **
+- Bugfix for broken Image URL and Author Display Name.
+- Added filters for all responses.
+- Added class options.
 
 ** 1.0.0 **
 - Initial Release.
