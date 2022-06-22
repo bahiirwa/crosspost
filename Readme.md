@@ -30,6 +30,9 @@ If you have any feedback, just write an issue. Or fork the code and submit a PR 
 
 ## Changelog
 
+### 0.2.1
+- Fix version issue.
+
 ### 0.2.0
 - Bugfix for broken Image URL and Author Display Name.
 - Added filters for all responses.

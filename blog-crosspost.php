@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Blog Crosspost
  * Description:       Automatically add posts from another WordPress website using a shortcode. like [blogcrosspost url="example.com"]
- * Version:           0.1.0
+ * Version:           0.2.1
  * Author:            Laurence Bahiirwa 
  * Author URI:        https://omukiguy.com
  * Plugin URI:        https://github.com/bahiirwa/blogcrosspost
