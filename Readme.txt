@@ -3,9 +3,9 @@ Contributors: laurencebahiirwa
 Donate link: https://omukiguy.com/
 Tags: blog, crosspost, Rest, 
 Requires at least: 4.9.0
-Tested up to: 6.0
+Tested up to: 6.6.1
 Requires PHP: 5.6
-Stable tag: 0.2.1
+Stable tag: 0.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,10 +23,11 @@ One can add some customization to the shortcode such as":
 * Link to external website = ```[blogcrosspost url="example.com"]```
 * Number of Posts to show  = ```[blogcrosspost number="3"]```
 * Name for the Readme link = ```[blogcrosspost readmoretext="Learn More"]```
+* Image Size to Display    = ```[blogcrosspost image_size="medium"]```. Options can be medium, large, thumbnail, full or any custom size. Default is full.
 
 or use all of them in one go as:
 
-```[blogcrosspost url="example.com" number="3" readmoretext="Learn More"]```
+```[blogcrosspost url="example.com" number="3" readmoretext="Learn More" image_size="medium"]```
 
 You can also change the HTML structure using ```apply_filters( 'blogcrosspost_link', $html, $atts );```
 
@@ -42,6 +43,14 @@ You can also change the HTML structure using ```apply_filters( 'blogcrosspost_li
 If you have any feedback, just write an issue. Or fork the code and submit a PR [on Github](https://github.com/bahiirwa/blogcrosspost).
 
 == Changelog ==
+
+### 0.2.2
+- Tested to WP 6.6.1.
+- Fix image display using images from the rest API.
+- Add an attribute for the image size to shortcode.
+
+### 0.2.1
+- Fix version issue.
 
 ** 0.2.0 **
 - Fix Versioning issue.

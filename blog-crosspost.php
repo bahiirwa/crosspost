@@ -1,14 +1,14 @@
 <?php
 /**
  * Plugin Name:       Blog Crosspost
- * Description:       Automatically add posts from another WordPress website using a shortcode. like [blogcrosspost url="example.com"]
- * Version:           0.2.1
+ * Description:       Automatically add posts from another WordPress website using the REST API with a shortcode like [blogcrosspost url="example.com"]
+ * Version:           0.2.2
  * Author:            Laurence Bahiirwa 
  * Author URI:        https://omukiguy.com
  * Plugin URI:        https://github.com/bahiirwa/blogcrosspost
  * Text Domain:       blogcrosspost
  * Requires at least: 4.9
- * Tested up to:      6.0
+ * Tested up to:      6.6.1
  * 
  * This is free software released under the terms of the General Public License,
  * version 2, or later. It is distributed WITHOUT ANY WARRANTY; without even the
@@ -23,6 +23,8 @@ namespace bahiirwa\Blogcrosspost;
 if ( ! defined( 'ABSPATH' ) ) {
 	die();
 }
+
+// Get image from WordPress REST API.
 
 class Blogcrosspost {
 	/**
@@ -52,6 +54,7 @@ class Blogcrosspost {
 		// Default values for when not passed in shortcode.
 		$defaults = [
 			'url'          => '',
+			'image_size'   => 'full',
 			'characters'   => '150',
 			'readmoretext' => 'Read more',
 			'number'       => '3',
@@ -67,7 +70,7 @@ class Blogcrosspost {
 
 		// Validate the user and the repo.
 		if ( empty( $atts['url'] ) ) {
-			$html = '<p>[blogcrosspost] Missing URL</p>';
+			$html = '<p>Add the Missing URL. The shortcode should be as such [blogcrosspost url="add url link goes here"]</p>';
 			return apply_filters( 'blogcrosspost_missing_url', $html );
 		}
 
@@ -95,21 +98,15 @@ class Blogcrosspost {
 			// When your count is at $atts['number'] "continue" is to go to the end of the loop.
 			if ( $atts['number'] == $count++ ) break;
 
-			$featured_image_src = '';
-
-			if ( ! empty( $data['featured_image_src'] ) ) {
-				$featured_image_src = $data['featured_image_src'];
-			}
-
 			$author = '';
-
 			if ( ! empty( $data['author_info']['display_name'] ) ) {
 				$author = $data['author_info']['display_name'];
 			}
 			
 			$html .= (
-				'<h2>' . $count . '</h2><div class="' . esc_attr( $atts['class'] ) . '" id="' . esc_attr( $data['id'] ) . '">' .
-					self::get_image_processed_from_api( $featured_image_src ) .
+				'<h2>' . $count . '</h2>' .
+                '<div class="' . esc_attr( $atts['class'] ) . '" id="' . esc_attr( $data['id'] ) . '">' .
+					self::get_image_processed_from_api( $atts['image_size'], $atts['url'], $data['featured_media'] ) .
 					'<h3>' . esc_attr( $data['title']['rendered'] ) . '</h3>' .
 					'<div class="content">' . esc_attr( self::reduce_content( $data['content']['rendered'], $atts['characters'] ) ) . '</div>' .
 					'<div class="post-meta">' .
@@ -136,16 +133,29 @@ class Blogcrosspost {
 	/**
 	 * Get Image displayed from API.
 	 *
-	 * @param integer $image_src Image post ID.
-	 *
+	 * @param array $url               URL of the Image in REST API.
+     * @param array $featured_media_id Featured Media ID.
+     *
 	 * @return string $image Image URL.
 	 */
-	private static function get_image_processed_from_api( $image_src ) {
+	private static function get_image_processed_from_api( $size, $url, $featured_media_id ) {
 
-		$image = '';
+        $featured_image_url = "{$url}/wp-json/wp/v2/media/{$featured_media_id}";
+        $response           = wp_remote_get( $featured_image_url );
+
+        if ( is_array( $response ) && ! is_wp_error( $response ) ) {
+            $body          = $response['body']; // use the content
+            $response_body = json_decode($body, true);
+            $image_src     = ( 'full' === $size ) ? $response_body['guid']['rendered'] : $response_body['media_details']['sizes'][ $size ]['source_url'];
+            $caption       = $response_body['caption']['rendered'];
+            $alt_text      = $response_body['alt_text'];
+        }
 
 		if ( ! empty( $image_src ) || null != $image_src ) {
-			$image = '<img class="featured-image" src="' . esc_url( $image_src ) . '" />';
+			$image = '<figure>
+                        <img class="featured-image" src="' . esc_url( $image_src ) . '" alt="' . esc_attr( $alt_text ) . '" />
+                        <figcaption>' . esc_attr( $caption ) . '</figcaption>
+                      </figure>';
 		}
 		
 		return $image;
